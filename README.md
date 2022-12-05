@@ -22,6 +22,38 @@
 
 </div>
 
+## Android support
+
+### Compile wasmtime for Android
+
+- install Android NDK (good instructions:
+  https://gendignoux.com/blog/2022/10/24/rust-library-android.html#android-sdk)
+
+        $ export ANDROID_TOOLCHAIN_ROOT=path/to/toolchains/llvm/prebuilt/<host-platform>
+        $ export PATH=$ANDROID_TOOLCHAIN_ROOT/bin:$PATH
+
+- configure cargo to use NDK tools:
+
+        $ cat > ~/.cargo/config.toml << EOF
+        [target."aarch64-linux-android"]
+        linker = "aarch64-linux-android29-clang"
+        ar = "llvm-ar"
+        EOF
+
+- some libraries insist on using `aarch64-linux-android-ar`, run in `$ANDROID_TOOLCHAIN_ROOT/bin/`
+
+        $ ln -s llvm-ar aarch64-linux-android-ar
+
+- in wasmtime directory:
+
+        cargo build --release -p wasmtime-c-api
+        cargo build --release --target aarch64-linux-android -p wasmtime-c-api
+
+### Update this repository
+
+    $ ci/local.sh path/to/wasmtime
+    $ cp wasmtime/target/aarch64-linux-android/release/libwasmtime.a build/linux-aarch64
+
 ## Installation
 
 ```sh
